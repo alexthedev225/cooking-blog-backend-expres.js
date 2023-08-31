@@ -6,7 +6,7 @@ const UserSchema = new Schema({
     username: { type: String, required: true },
     password: { type: String, required: true },
     name: { type: String, required: true },
-    imageProfil: { type: String, required: false }
+    imageProfil: { type: Buffer } // Utiliser le type Buffer pour les données binaires
 });
 
 module.exports = mongoose.model('User', UserSchema);

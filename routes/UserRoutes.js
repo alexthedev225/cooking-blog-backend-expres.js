@@ -4,15 +4,7 @@ const multer = require("multer");
 const userController = require("../controllers/UserController");
 
 // Configuration de multer pour le téléchargement de fichiers
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
+const storage = multer.memoryStorage(); // Utilisez memoryStorage pour stocker en tant que données binaires
 const upload = multer({ storage: storage });
 
 router.post(
@@ -21,6 +13,6 @@ router.post(
   userController.createUser
 );
 router.post("/login", userController.loginUser);
-router.post("/logout", userController.logoutUser)
+router.post("/logout", userController.logoutUser);
 
 module.exports = router;
