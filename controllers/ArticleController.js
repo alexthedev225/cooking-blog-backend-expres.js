@@ -2,14 +2,7 @@ const Article = require("../models/ArticleModel");
 const multer = require("multer");
 
 // Configuration de Multer pour gérer le téléchargement d'images
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/uploads/"); // Le dossier où les images seront stockées
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname); // Nom unique pour l'image
-  },
-});
+const storage = multer.memoryStorage()
 const upload = multer({ storage: storage });
 
 const articleController = {
@@ -79,7 +72,7 @@ const articleController = {
         }
 
         const { title, content } = req.body;
-        const image = req.file.filename;
+        const image = req.file.buffer; // Récupérez les données binaires du fichier
         const author = req.auth.userId; // Récupérez l'ID de l'utilisateur à partir du token JWT
         const newArticle = new Article({
           title,
