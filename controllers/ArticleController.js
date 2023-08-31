@@ -99,13 +99,13 @@ const articleController = {
 
   updateArticle: async (req, res) => {
     try {
-      const { title, content, categories, image } = req.body;
+      const { title, content, image } = req.body;
       const updatedArticle = await Article.findByIdAndUpdate(
         req.params.id,
         {
           title,
           content,
-          categories,
+          // categories,
           image,
         },
         { new: true }
