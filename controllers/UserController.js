@@ -17,7 +17,7 @@ exports.createUser = (req, res) => {
         password: hash,
         name,
         email,
-        imageProfil: req.file.filename, // Chemin du fichier téléchargé
+        imageProfil: req.file.buffer, // Chemin du fichier téléchargé
       });
       user
         .save()
