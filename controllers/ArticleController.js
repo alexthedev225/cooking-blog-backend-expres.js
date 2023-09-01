@@ -8,17 +8,26 @@ const upload = multer({ storage: storage });
 const articleController = {
   getAllArticles: async (req, res) => {
     try {
+      let query = [];
+
+      // Vérifiez si le paramètre "limitToFive" est présent et défini à true
+      if (req.query.limitToFive === "true") {
+        query.push({
+          $limit: 5, // Limiter le nombre de documents récupérés à 5
+        });
+      }
+
       const articles = await Article.aggregate([
         {
           $lookup: {
-            from: "users", // Le nom de la collection des utilisateurs
+            from: "users",
             localField: "author",
             foreignField: "_id",
             as: "authorData",
           },
         },
         {
-          $unwind: "$authorData", // Dérouler le tableau auteurData pour avoir une seule entrée
+          $unwind: "$authorData",
         },
         {
           $project: {
@@ -26,9 +35,11 @@ const articleController = {
             title: 1,
             content: 1,
             image: 1,
-            author: "$authorData", // Utiliser directement les informations de l'auteur
+            createdAt: 1,
+            author: "$authorData",
           },
         },
+        ...query, // Utilisez le tableau de requêtes conditionnelles ici
       ]);
 
       res.json(articles);
