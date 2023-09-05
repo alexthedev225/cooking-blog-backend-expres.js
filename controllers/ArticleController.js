@@ -2,7 +2,7 @@ const Article = require("../models/ArticleModel");
 const multer = require("multer");
 
 // Configuration de Multer pour gérer le téléchargement d'images
-const storage = multer.memoryStorage()
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const articleController = {
@@ -52,12 +52,12 @@ const articleController = {
 
   getArticleById: async (req, res) => {
     try {
-      const article = await Article.findById(req.params.id)
-        .populate("author", "username")
-        .populate("categories", "name");
+      const article = await Article.findById(req.params.id).populate("author"); // Le nom du champ de l'auteur dans le modèle Article
+
       if (!article) {
         return res.status(404).json({ message: "Article non trouvé" });
       }
+
       res.json(article);
     } catch (error) {
       res
@@ -74,12 +74,10 @@ const articleController = {
             .status(400)
             .json({ message: "Erreur lors du téléchargement du fichier" });
         } else if (err) {
-          return res
-            .status(500)
-            .json({
-              message:
-                "Une erreur s'est produite lors du téléchargement du fichier",
-            });
+          return res.status(500).json({
+            message:
+              "Une erreur s'est produite lors du téléchargement du fichier",
+          });
         }
 
         const { title, content } = req.body;
@@ -103,21 +101,48 @@ const articleController = {
 
   updateArticle: async (req, res) => {
     try {
-      const { title, content, image } = req.body;
-      const updatedArticle = await Article.findByIdAndUpdate(
-        req.params.id,
-        {
-          title,
-          content,
-          // categories,
-          image,
-        },
-        { new: true }
-      );
-      if (!updatedArticle) {
-        return res.status(404).json({ message: "Article non trouvé" });
-      }
-      res.json(updatedArticle);
+      // Utilisez la méthode `upload.single` pour gérer le téléchargement du fichier
+      upload.single("image")(req, res, async (err) => {
+        if (err instanceof multer.MulterError) {
+          return res
+            .status(400)
+            .json({ message: "Erreur lors du téléchargement du fichier" });
+        } else if (err) {
+          return res.status(500).json({
+            message:
+              "Une erreur s'est produite lors du téléchargement du fichier",
+          });
+        }
+
+        const { title, content } = req.body;
+        let image;
+
+        // Vérifiez si un nouveau fichier image a été téléchargé
+        if (req.file) {
+          image = req.file.buffer; // Récupérez les données binaires du nouveau fichier image
+        } else {
+          // Si aucun nouveau fichier n'a été téléchargé, conservez l'image existante
+          const existingArticle = await Article.findById(req.params.id);
+          image = existingArticle.image;
+        }
+
+        // Mettez à jour l'article avec les nouvelles données, y compris l'image
+        const updatedArticle = await Article.findByIdAndUpdate(
+          req.params.id,
+          {
+            title,
+            content,
+            image,
+          },
+          { new: true }
+        );
+
+        if (!updatedArticle) {
+          return res.status(404).json({ message: "Article non trouvé" });
+        }
+
+        res.json(updatedArticle);
+      });
     } catch (error) {
       res
         .status(500)
