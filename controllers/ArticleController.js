@@ -101,6 +101,11 @@ const articleController = {
 
   updateArticle: async (req, res) => {
     try {
+      // Assurez-vous que l'utilisateur est authentifié
+      if (!req.auth.userId) {
+        return res.status(401).json({ message: "Non autorisé" });
+      }
+
       // Utilisez la méthode `upload.single` pour gérer le téléchargement du fichier
       upload.single("image")(req, res, async (err) => {
         if (err instanceof multer.MulterError) {
@@ -126,7 +131,13 @@ const articleController = {
           image = existingArticle.image;
         }
 
-        // Mettez à jour l'article avec les nouvelles données, y compris l'image
+        // Vérifiez si l'utilisateur authentifié est l'auteur de l'article
+        const existingArticle = await Article.findById(req.params.id);
+        if (existingArticle.author.toString() !== req.auth.userId) {
+          return res.status(403).json({ message: "Non autorisé" });
+        }
+
+        // Mettez à jour l'article avec les nouvelles données, y compris l'image et l'auteur
         const updatedArticle = await Article.findByIdAndUpdate(
           req.params.id,
           {
@@ -149,6 +160,7 @@ const articleController = {
         .json({ message: "Erreur lors de la mise à jour de l'article" });
     }
   },
+
 
   deleteArticle: async (req, res) => {
     try {
