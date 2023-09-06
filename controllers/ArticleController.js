@@ -182,7 +182,7 @@ const articleController = {
   
       // Supprimez l'article
       await article.remove();
-  
+      console.log("Article supprimé avec succès");
       res.json({ message: "Article supprimé avec succès" });
     } catch (error) {
       res.status(500).json({ message: "Erreur lors de la suppression de l'article" });
