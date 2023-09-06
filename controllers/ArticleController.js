@@ -33,6 +33,7 @@ const articleController = {
           $project: {
             _id: 1,
             title: 1,
+            subTitle: 1,
             content: 1,
             image: 1,
             createdAt: 1,
@@ -80,12 +81,13 @@ const articleController = {
           });
         }
 
-        const { title, content } = req.body;
+        const { title, content, subTitle } = req.body;
         const image = req.file.buffer; // Récupérez les données binaires du fichier
         const author = req.auth.userId; // Récupérez l'ID de l'utilisateur à partir du token JWT
         const newArticle = new Article({
           title,
           content,
+          subTitle,
           image,
           author,
         });
@@ -119,7 +121,7 @@ const articleController = {
           });
         }
 
-        const { title, content } = req.body;
+        const { title, content, subTitle } = req.body;
         let image;
 
         // Vérifiez si un nouveau fichier image a été téléchargé
@@ -142,6 +144,7 @@ const articleController = {
           req.params.id,
           {
             title,
+            subTitle,
             content,
             image,
           },

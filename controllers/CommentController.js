@@ -3,11 +3,13 @@ const Comment = require('../models/CommentModel');
 const commentController = {
   createComment: async (req, res) => {
     try {
-      const { content, author, article } = req.body;
+      const { content } = req.body;
+      const author = req.auth.userId;
+      const {articleId} = req.params
       const newComment = new Comment({
         content,
         author,
-        article,
+        article: articleId,
       });
       await newComment.save();
       res.json(newComment);
