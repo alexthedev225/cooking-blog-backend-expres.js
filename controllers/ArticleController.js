@@ -167,27 +167,25 @@ const articleController = {
         return res.status(401).json({ message: "Non autorisé" });
       }
   
-      // Récupérez l'article
-      const article = await Article.findById(req.params.id);
+      // Utilisez findByIdAndRemove pour supprimer l'article
+      const deletedArticle = await Article.findByIdAndRemove(req.params.id);
   
-      // Vérifiez si l'article existe
-      if (!article) {
+      // Vérifiez si l'article a été trouvé et supprimé avec succès
+      if (!deletedArticle) {
         return res.status(404).json({ message: "Article non trouvé" });
       }
   
       // Vérifiez si l'utilisateur authentifié est l'auteur de l'article
-      if (article.author.toString() !== req.auth.userId) {
+      if (deletedArticle.author.toString() !== req.auth.userId) {
         return res.status(403).json({ message: "Non autorisé" });
       }
   
-      // Supprimez l'article
-      await article.remove();
       console.log("Article supprimé avec succès");
       res.status(200).json({ message: "Article supprimé avec succès" });
     } catch (error) {
       res.status(500).json({ message: "Erreur lors de la suppression de l'article" });
     }
-  },
+  },  
 };
 
 module.exports = articleController;
