@@ -5,7 +5,7 @@ const auth = require('../middlewares/auth');
 const router = express.Router();
 
 // Création d'un nouveau commentaire
-router.post('/create', auth, commentController.createComment);
+router.post('/create/:id', auth, commentController.createComment);
 
 // Récupération de tous les commentaires
 router.get('/', commentController.getAllComments);
