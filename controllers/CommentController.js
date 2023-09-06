@@ -5,11 +5,11 @@ const commentController = {
     try {
       const { content } = req.body;
       const author = req.auth.userId;
-      const {articleId} = req.params
+      const article = req.params.id
       const newComment = new Comment({
         content,
         author,
-        article: articleId,
+        article,
       });
       await newComment.save();
       res.json(newComment);
