@@ -160,19 +160,32 @@ const articleController = {
         .json({ message: "Erreur lors de la mise à jour de l'article" });
     }
   },
-
-
   deleteArticle: async (req, res) => {
     try {
-      const deletedArticle = await Article.findByIdAndDelete(req.params.id);
-      if (!deletedArticle) {
+      // Assurez-vous que l'utilisateur est authentifié
+      if (!req.auth.userId) {
+        return res.status(401).json({ message: "Non autorisé" });
+      }
+  
+      // Récupérez l'article
+      const article = await Article.findById(req.params.id);
+  
+      // Vérifiez si l'article existe
+      if (!article) {
         return res.status(404).json({ message: "Article non trouvé" });
       }
+  
+      // Vérifiez si l'utilisateur authentifié est l'auteur de l'article
+      if (article.author.toString() !== req.auth.userId) {
+        return res.status(403).json({ message: "Non autorisé" });
+      }
+  
+      // Supprimez l'article
+      await article.remove();
+  
       res.json({ message: "Article supprimé avec succès" });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Erreur lors de la suppression de l'article" });
+      res.status(500).json({ message: "Erreur lors de la suppression de l'article" });
     }
   },
 };
