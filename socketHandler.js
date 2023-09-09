@@ -6,7 +6,7 @@ module.exports = {
   init: (server) => {
     io = socketIo(server, {
       cors: {
-        origin: "https://cooking-fever.vercel.app/", // Remplacez par l'URL de votre frontend
+        origin: "https://cooking-fever.vercel.app", // Remplacez par l'URL de votre frontend
         methods: ["GET", "POST"],
       },
     }); // Attachez Socket.io au serveur HTTP avec la configuration CORS
