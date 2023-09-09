@@ -1,5 +1,6 @@
-const Comment = require('../models/CommentModel')
-const Article = require('../models/ArticleModel')
+const Comment = require("../models/CommentModel");
+const Article = require("../models/ArticleModel");
+const User = require("../models/UserModel");
 const socketHandler = require("../socketHandler"); // Utilisez le nouveau module pour accéder à io
 
 const commentController = {
@@ -9,9 +10,19 @@ const commentController = {
       const author = req.auth.userId;
       const articleId = req.params.id;
 
+      // Obtenez les informations de l'auteur à partir de la base de données
+      const authorData = await User.findById(author);
+
+      if (!authorData) {
+        socketHandler.getIO().emit("comment_error", "Auteur non trouvé");
+        return res.status(404).json({ message: "Auteur non trouvé" });
+      }
+
       const newComment = new Comment({
         content,
         author,
+        authorName: authorData.name, // Ajoutez le nom de l'auteur au commentaire
+        authorImage: authorData.imageProfil, // Ajoutez l'image de l'auteur au commentaire
         article: articleId,
       });
 
@@ -31,8 +42,12 @@ const commentController = {
       res.json(newComment);
     } catch (error) {
       console.error("Erreur lors de la création du commentaire", error);
-      socketHandler.getIO().emit("comment_error", "Erreur lors de la création du commentaire");
-      res.status(500).json({ message: "Erreur lors de la création du commentaire" });
+      socketHandler
+        .getIO()
+        .emit("comment_error", "Erreur lors de la création du commentaire");
+      res
+        .status(500)
+        .json({ message: "Erreur lors de la création du commentaire" });
     }
   },
 
