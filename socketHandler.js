@@ -1,4 +1,5 @@
 const socketIo = require("socket.io");
+const Comment = require('./models/CommentModel')
 
 let io; // Initialisez io en tant que variable globale pour pouvoir y accéder ailleurs
 
@@ -10,7 +11,13 @@ module.exports = {
         methods: ["GET", "POST"],
       },
     }); // Attachez Socket.io au serveur HTTP avec la configuration CORS
-
+    Comment.find()
+    .then((comments) => {
+      socket.emit("initial_comments", comments);
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la récupération des commentaires initiaux :", error);
+    });
     io.on("connection", (socket) => {
       console.log("Client connecté");
       socket.on("disconnect", () => {

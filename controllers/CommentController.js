@@ -37,7 +37,7 @@ const commentController = {
 
       await Promise.all([newComment.save(), article.save()]);
 
-      socketHandler.getIO().emit("comments", newComment);
+      socketHandler.getIO().emit(`comments_article_${articleId}`, newComment);
 
 
       console.log("Nouveau commentaire émis :", newComment); // Ajoutez cette ligne pour vérifier les données du commentaire émis
