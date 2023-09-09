@@ -1,5 +1,6 @@
 const Article = require("../models/ArticleModel");
 const multer = require("multer");
+const Comment = require("../models/CommentModel");
 
 // Configuration de Multer pour gérer le téléchargement d'images
 const storage = multer.memoryStorage();
@@ -43,6 +44,12 @@ const articleController = {
         ...query, // Utilisez le tableau de requêtes conditionnelles ici
       ]);
 
+      // Récupérer les commentaires associés à chaque article
+      for (const article of articles) {
+        const comments = await Comment.find({ article: article._id });
+        article.comments = comments;
+      }
+
       res.json(articles);
     } catch (error) {
       res
@@ -53,19 +60,22 @@ const articleController = {
 
   getArticleById: async (req, res) => {
     try {
-      const article = await Article.findById(req.params.id).populate("author"); // Le nom du champ de l'auteur dans le modèle Article
-
+      const article = await Article.findById(req.params.id).populate("author");
+  
       if (!article) {
         return res.status(404).json({ message: "Article non trouvé" });
       }
-
+  
+      // Récupérer les commentaires associés à l'article
+      const comments = await Comment.find({ article: article._id });
+      article.comments = comments;
+  
       res.json(article);
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Erreur lors de la récupération de l'article" });
+      res.status(500).json({ message: "Erreur lors de la récupération de l'article" });
     }
   },
+  
   createArticle: async (req, res) => {
     try {
       // Utilisez la méthode `upload.single` ici pour gérer le téléchargement du fichier
@@ -169,26 +179,28 @@ const articleController = {
       if (!req.auth.userId) {
         return res.status(401).json({ message: "Non autorisé" });
       }
-  
+
       // Utilisez findByIdAndRemove pour supprimer l'article
       const deletedArticle = await Article.findByIdAndRemove(req.params.id);
-  
+
       // Vérifiez si l'article a été trouvé et supprimé avec succès
       if (!deletedArticle) {
         return res.status(404).json({ message: "Article non trouvé" });
       }
-  
+
       // Vérifiez si l'utilisateur authentifié est l'auteur de l'article
       if (deletedArticle.author.toString() !== req.auth.userId) {
         return res.status(403).json({ message: "Non autorisé" });
       }
-  
+
       console.log("Article supprimé avec succès");
       res.status(200).json({ message: "Article supprimé avec succès" });
     } catch (error) {
-      res.status(500).json({ message: "Erreur lors de la suppression de l'article" });
+      res
+        .status(500)
+        .json({ message: "Erreur lors de la suppression de l'article" });
     }
-  },  
+  },
 };
 
 module.exports = articleController;
