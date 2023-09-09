@@ -39,8 +39,6 @@ const commentController = {
 
       socketHandler.getIO().emit("comments", {
         ...newComment.toJSON(),
-        authorName: authorData.name,
-        authorImage: authorData.imageProfil,
       });
       
       console.log("Nouveau commentaire émis :", newComment); // Ajoutez cette ligne pour vérifier les données du commentaire émis
