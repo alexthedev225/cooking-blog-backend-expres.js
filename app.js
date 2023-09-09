@@ -11,15 +11,20 @@ const commentRoutes = require("./routes/CommentRoutes");
 const socketHandler = require("./socketHandler"); // Nouveau module pour la gestion de Socket.io
 
 const app = express();
-app.use(cors({
-  origin: "https://cooking-fever.vercel.app", // Remplacez par l'URL de votre frontend
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true, // Autorisez les cookies, si nécessaire
-}));
+app.use(
+  cors({
+    origin: ["https://cooking-fever.vercel.app", "http://localhost:3000"], // Remplacez par l'URL de votre frontend
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // Autorisez les cookies, si nécessaire
+  })
+);
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://cooking-fever.vercel.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header("Access-Control-Allow-Origin", [
+    "https://cooking-fever.vercel.app",
+    "http://localhost:3000",
+  ]);
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
 require("dotenv").config();
