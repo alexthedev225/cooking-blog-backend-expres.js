@@ -37,7 +37,13 @@ const commentController = {
 
       await Promise.all([newComment.save(), article.save()]);
 
-      socketHandler.getIO().emit("comments", newComment);
+      socketHandler.getIO().emit("comments", {
+        ...newComment.toJSON(),
+        authorName: authorData.name,
+        authorImage: authorData.imageProfil,
+      });
+      
+      console.log("Nouveau commentaire émis :", newComment); // Ajoutez cette ligne pour vérifier les données du commentaire émis
 
       res.json(newComment);
     } catch (error) {
