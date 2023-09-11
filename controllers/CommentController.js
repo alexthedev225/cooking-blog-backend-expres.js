@@ -26,8 +26,9 @@ const commentController = {
         authorImage: authorData.imageProfil,
         article: articleId,
         createdAt, // Utilisez la date de création ici
+        originalCreatedAt: createdAt, // Stockez la date de création initiale
       });
-
+      
       const article = await Article.findById(articleId);
 
       if (!article) {
