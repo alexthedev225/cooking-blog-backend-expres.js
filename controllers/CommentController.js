@@ -9,41 +9,42 @@ const commentController = {
       const { content } = req.body;
       const author = req.auth.userId;
       const articleId = req.params.id;
-
+  
       // Obtenez les informations de l'auteur à partir de la base de données
       const authorData = await User.findById(author);
-
+  
       if (!authorData) {
         socketHandler.getIO().emit("comment_error", "Auteur non trouvé");
         return res.status(404).json({ message: "Auteur non trouvé" });
       }
-
+  
       const newComment = new Comment({
         content,
         author,
-        authorName: authorData.name, // Ajoutez le nom de l'auteur au commentaire
-        authorImage: authorData.imageProfil, // Ajoutez l'image de l'auteur au commentaire
+        authorName: authorData.name,
+        authorImage: authorData.imageProfil,
         article: articleId,
       });
-
+  
       const article = await Article.findById(articleId);
-
+  
       if (!article) {
         socketHandler.getIO().emit("comment_error", "Article non trouvé");
         return res.status(404).json({ message: "Article non trouvé" });
       }
-
+  
       article.comments.push(newComment);
-
+  
       await Promise.all([newComment.save(), article.save()]);
-
+  
+      // Émettez le nouveau commentaire avec la date de création actuelle
       socketHandler.getIO().emit(`comments_article_${articleId}`, {
         comment: newComment,
-        createdAt: newComment.createdAt, // Même date de création que dans le commentaire
+        createdAt: new Date(), // Date de création actuelle
       });
-      
-      console.log("Nouveau commentaire émis :", newComment); // Ajoutez cette ligne pour vérifier les données du commentaire émis
-
+  
+      console.log("Nouveau commentaire émis :", newComment);
+  
       res.json(newComment);
     } catch (error) {
       console.error("Erreur lors de la création du commentaire", error);
