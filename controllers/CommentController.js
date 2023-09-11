@@ -39,7 +39,6 @@ const commentController = {
 
       await Promise.all([newComment.save(), article.save()]);
 
-      // Émettez le nouveau commentaire avec la date de création actuelle
       // Émettez le nouveau commentaire avec la date de création au format ISO 8601
       socketHandler.getIO().emit(`comments_article_${articleId}`, {
         comment: newComment,
@@ -73,7 +72,7 @@ const commentController = {
 
   getCommentsByArticle: async (req, res) => {
     try {
-      const articleId = req.params.id;
+      const articleId = req.params.articleId;
       const comments = await Comment.find({ article: articleId });
       res.json(comments);
     } catch (error) {

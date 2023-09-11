@@ -11,7 +11,7 @@ router.post('/create/:id', auth, commentController.createComment);
 router.get('/', commentController.getAllComments);
 
 // Récupération des commentaires pour un article spécifique
-router.get('/article/:id', commentController.getCommentsByArticle);
+router.get('/:articleId', commentController.getCommentsByArticle);
 
 // Suppression d'un commentaire par son ID
 router.delete('/:id', commentController.deleteComment);
