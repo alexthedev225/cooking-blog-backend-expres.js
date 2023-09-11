@@ -40,9 +40,10 @@ const commentController = {
       await Promise.all([newComment.save(), article.save()]);
 
       // Émettez le nouveau commentaire avec la date de création actuelle
+      // Émettez le nouveau commentaire avec la date de création au format ISO 8601
       socketHandler.getIO().emit(`comments_article_${articleId}`, {
         comment: newComment,
-        createdAt, // Date de création actuelle
+        createdAt: newComment.createdAt.toISOString(), // Format ISO 8601
       });
 
       console.log("Nouveau commentaire émis :", newComment);
