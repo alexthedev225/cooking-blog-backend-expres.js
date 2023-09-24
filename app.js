@@ -39,7 +39,9 @@ mongoose
     });
   })
   .catch((error) => console.error(error));
-
+app.head("/", (req, res) => {
+  res.status(200).end();
+});
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/articles", articleRoutes);
