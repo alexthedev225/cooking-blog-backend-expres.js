@@ -39,9 +39,42 @@ mongoose
     });
   })
   .catch((error) => console.error(error));
+
 app.head("/", (req, res) => {
   res.status(200).end();
 });
+
+const mailgun = require('mailgun-js')({
+  apiKey: process.env.MAILGUN_API_KEY,
+  domain: process.env.MAILGUN_DOMAIN,
+});
+
+app.post("/envoyer-email", (req, res) => {
+  const { email, message, nom } = req.body;
+
+  if (!email || !message) {
+    return res.status(400).json({ error: "L'e-mail et le message sont obligatoires." });
+  }
+
+  const data = {
+    from: email,
+    to: "alexcode225@gmail.com", 
+    subject: `message de ${nom}`,
+    text: `E-mail: ${email}\nMessage: ${message}`,
+  };
+
+  mailgun.messages().send(data, (error, body) => {
+    if (error) {
+      console.error("Erreur lors de l'envoi de l'e-mail", error);
+      res.status(500).json({ error: "Erreur lors de l'envoi de l'e-mail." });
+    } else {
+      console.log("E-mail envoyé avec succès", body);
+      res.json({ message: "E-mail envoyé avec succès" });
+    }
+  });
+});
+
+
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/articles", articleRoutes);
